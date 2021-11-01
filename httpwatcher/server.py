@@ -30,7 +30,7 @@ __all__ = [
 class HttpWatcherServer(tornado.web.Application):
 
     def __init__(self, static_root, watch_paths=None, on_reload=None, host="localhost", port=5555,
-                 server_base_path="/", watcher_interval=1.0, recursive=True, open_browser=False,
+                 server_base_path="/", watcher_interval=1.0, recursive=True, open_browser=False, open_filename=None,
                  open_browser_delay=1.0, **kwargs):
         """Constructor for the HTTP watcher server.
 
@@ -46,6 +46,7 @@ class HttpWatcherServer(tornado.web.Application):
             recursive: Should the watch paths be monitored recursively?
             open_browser: Should this watcher server attempt to automatically open the user's default web browser
                 at the root of the project?
+            open_filename: Should the browser open a specific file that is not 'index.html'?
             open_browser_delay: The number of seconds to wait until attempting to open the user's browser.
         """
         self.static_root = os.path.abspath(static_root)
@@ -53,6 +54,7 @@ class HttpWatcherServer(tornado.web.Application):
             raise MissingFolderError(self.static_root)
 
         self.watch_paths = watch_paths if watch_paths is not None else [static_root]
+        self.open_filename = open_filename
 
         if on_reload is not None:
             if not callable(on_reload):
@@ -122,7 +124,10 @@ class HttpWatcherServer(tornado.web.Application):
 
     @gen.coroutine
     def trigger_browser_open(self):
-        url = "http://%s:%d%s" % (self.host, self.port, self.server_base_path)
+        if open_filename:
+            url = "http://%s:%d%s%s" % (self.host, self.port, self.server_base_path, self.open_filename)
+        else:
+            url = "http://%s:%d%s" % (self.host, self.port, self.server_base_path, self.open_filename)
         logger.debug("Attempting to open user web browser at: %s", url)
         try:
             webbrowser.open(url)

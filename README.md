@@ -102,7 +102,9 @@ server = HttpWatcherServer(
     server_base_path="/blog/",            # serve static content from http://127.0.0.1:5556/blog/
     watcher_interval=1.0,                 # maximum reload frequency (seconds)
     recursive=True,                       # watch for changes in /path/to/html recursively
-    open_browser=True                     # automatically attempt to open a web browser (default: False for HttpWatcherServer)
+    open_browser=True                     # automatically attempt to open a web browser (default: 
+    open_filename=None                    # what filename to open with the browser
+    False for HttpWatcherServer)
 )
 server.listen()
 
